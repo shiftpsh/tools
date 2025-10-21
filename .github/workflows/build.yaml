@@ -1,0 +1,40 @@
+name: Build and Deploy Site
+on:
+  push:
+    branches:
+      - main
+      - "releases/**"
+jobs:
+  build-dev:
+    if: ${{ github.ref != 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v2
+      - name: Install dependencies
+        run: yarn
+      - name: Build
+        run: yarn build
+  build-stable:
+    if: ${{ github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY_SECRET }}
+      PUBLIC_URL: https://tools.shiftpsh.com
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v2
+      - name: Install dependencies
+        run: yarn
+      - name: Build
+        run: yarn build
+      - name: Deploy
+        uses: reggionick/s3-deploy@v3
+        with:
+          folder: dist
+          bucket: ${{ vars.AWS_S3_BUCKET }}
+          bucket-region: ${{ vars.AWS_REGION }}
+          dist-id: ${{ vars.AWS_CLOUDFRONT_DISTRIBUTION }}
+          no-cache: true
+          private: true
