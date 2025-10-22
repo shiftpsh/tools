@@ -19,6 +19,8 @@ const pathArea = (path: [number, number][]) => {
 interface Options {
   compoundPath?: boolean
   centerBlankSize?: number
+  paddingSize?: number
+  showGrid?: boolean
 }
 
 export const convertToPaths = (
@@ -26,7 +28,12 @@ export const convertToPaths = (
   data: Uint8Array<ArrayBufferLike>,
   options: Options = {},
 ) => {
-  const { compoundPath = true, centerBlankSize = 0 } = options
+  const {
+    compoundPath = true,
+    centerBlankSize = 0,
+    paddingSize = 0,
+    showGrid = false,
+  } = options
   const copiedData = new Uint8Array(data)
 
   const m = n + 1
@@ -244,9 +251,34 @@ export const convertToPaths = (
   )
 
   return [
-    `<svg viewBox="0 0 ${n} ${n}" xmlns="http://www.w3.org/2000/svg">`,
+    `<svg viewBox="${-paddingSize} ${-paddingSize} ${n + paddingSize * 2} ${n + paddingSize * 2}" xmlns="http://www.w3.org/2000/svg">`,
     '<g>',
     ...svgPathDefinitions.map((d) => `<path fill="black" d="${d}" />`),
+    ...(showGrid
+      ? ['<g stroke="lightgray" stroke-width="0.05">'].concat(
+          Array.from({ length: n + 1 + paddingSize * 2 }, (_, i) => {
+            return [
+              `<line x1="${i - paddingSize}" y1="${-paddingSize}" x2="${i - paddingSize}" y2="${n + paddingSize}" />`,
+              `<line x1="${-paddingSize}" y1="${i - paddingSize}" x2="${n + paddingSize}" y2="${i - paddingSize}" />`,
+            ].join('\n')
+          }),
+        )
+      : []),
+    ...(showGrid && centerBlankSize > 0
+      ? [
+          `<rect x="${Math.floor((n - centerBlankSize) / 2)}" y="${Math.floor(
+            (n - centerBlankSize) / 2,
+          )}" width="${centerBlankSize}" height="${centerBlankSize}" stroke="cyan" stroke-width="0.1" fill="none" />`,
+        ]
+      : []),
+    ...(showGrid && paddingSize > 0
+      ? [
+          `<rect x="0" y="0" width="${
+            n
+          }" height="${n}" stroke="red" stroke-width="0.1" fill="none" />`,
+        ]
+      : []),
+    ...(showGrid ? ['</g>'] : []),
     '</g>',
     `</svg>`,
   ].join('\n')
