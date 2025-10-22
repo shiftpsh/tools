@@ -12,21 +12,27 @@
     "check": "prettier --write . && eslint --fix"
   },
   "dependencies": {
-    "@tailwindcss/vite": "^4.0.6",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/material": "^7.3.4",
+    "@tabler/icons-react": "^3.35.0",
     "@tanstack/react-devtools": "^0.7.0",
     "@tanstack/react-router": "^1.132.0",
     "@tanstack/react-router-devtools": "^1.132.0",
     "@tanstack/router-plugin": "^1.132.0",
+    "es-toolkit": "^1.40.0",
     "lucide-react": "^0.545.0",
+    "polished": "^4.3.1",
+    "qrcode": "^1.5.4",
     "react": "^19.2.0",
-    "react-dom": "^19.2.0",
-    "tailwindcss": "^4.0.6"
+    "react-dom": "^19.2.0"
   },
   "devDependencies": {
     "@tanstack/eslint-config": "^0.3.0",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/react": "^16.2.0",
     "@types/node": "^22.10.2",
+    "@types/qrcode": "^1.5.5",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
     "@vitejs/plugin-react": "^5.0.4",

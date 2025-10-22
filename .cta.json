@@ -2,7 +2,7 @@
   "projectName": "tools.shiftpsh.com",
   "mode": "file-router",
   "typescript": true,
-  "tailwind": true,
+  "tailwind": false,
   "packageManager": "npm",
   "addOnOptions": {},
   "git": true,
