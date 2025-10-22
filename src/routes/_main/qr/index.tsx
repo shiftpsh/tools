@@ -26,7 +26,7 @@ function RouteComponent() {
   const [input, setInput] = useState('')
   const [version, setVersion] = useState<number | null>(null)
   const [centerBlankSize, setCenterBlankSize] = useState(0)
-  const [paddingSize, setPaddingSize] = useState(0)
+  const [paddingSize, setPaddingSize] = useState(4)
   const [errorCorrectionLevel, setErrorCorrectionLevel] =
     useState<ErrorCorrectionLevel>('M')
   const [showGrid, setShowGrid] = useState(false)
@@ -95,14 +95,27 @@ function RouteComponent() {
             whiteSpace: 'pre',
             lineHeight: 0.8,
             p: 2,
+            backgroundColor: 'grey.500',
           }}
         >
           <Stack direction="row">
-            <div style={{ flex: 1 }}>
-              <div
+            <div
+              style={{
+                flex: 1,
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                minWidth: 0,
+              }}
+            >
+              <Paper
                 style={{
-                  maxWidth: 256,
+                  display: 'block',
+                  width: 256,
+                  maxWidth: '100%',
+                  aspectRatio: '1 / 1',
                   margin: '0 auto',
+                  backgroundColor: 'white',
                 }}
                 dangerouslySetInnerHTML={{ __html: data }}
               />
