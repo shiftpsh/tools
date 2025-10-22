@@ -16,11 +16,31 @@ const pathArea = (path: [number, number][]) => {
   return Math.abs(area) / 2
 }
 
+interface Options {
+  compoundPath?: boolean
+  centerBlankSize?: number
+}
+
 export const convertToPaths = (
   n: number,
   data: Uint8Array<ArrayBufferLike>,
+  options: Options = {},
 ) => {
+  const { compoundPath = true, centerBlankSize = 0 } = options
+  const copiedData = new Uint8Array(data)
+
   const m = n + 1
+
+  // Clear center blank area
+  if (centerBlankSize > 0) {
+    const start = Math.floor((n - centerBlankSize) / 2)
+    const end = start + centerBlankSize
+    for (let x = start; x < end; x++) {
+      for (let y = start; y < end; y++) {
+        copiedData[x * n + y] = 0
+      }
+    }
+  }
 
   // Find connected components
   const visited = new Set<number>()
@@ -32,7 +52,7 @@ export const convertToPaths = (
       const ny = (u % n) + dy[d]
       if (nx >= 0 && ny >= 0 && nx < n && ny < n) {
         const v = nx * n + ny
-        if (!visited.has(v) && data[v]) {
+        if (!visited.has(v) && copiedData[v]) {
           visited.add(v)
           component.push(v)
           dfs(v, component)
@@ -44,7 +64,7 @@ export const convertToPaths = (
   for (let x = 0; x < n; x++) {
     for (let y = 0; y < n; y++) {
       const u = x * n + y
-      if (data[u] && !visited.has(u)) {
+      if (copiedData[u] && !visited.has(u)) {
         visited.add(u)
         const component = [u]
         dfs(u, component)
@@ -63,7 +83,13 @@ export const convertToPaths = (
       for (let d = 0; d < 4; d++) {
         const nx = x + dx[d]
         const ny = y + dy[d]
-        if (nx < 0 || ny < 0 || nx >= n || ny >= n || !data[nx * n + ny]) {
+        if (
+          nx < 0 ||
+          ny < 0 ||
+          nx >= n ||
+          ny >= n ||
+          !copiedData[nx * n + ny]
+        ) {
           const bxStart = x + bx1[d]
           const byStart = y + by1[d]
           const bxEnd = x + bx2[d]
@@ -193,29 +219,34 @@ export const convertToPaths = (
       }
     })
 
-    const pathData = simplifiedPaths
-      .map((path) => {
-        return (
-          'M' +
-          path
-            .map((p) => {
-              const x = Math.floor(p / m)
-              const y = p % m
-              return `${x},${y}`
-            })
-            .join('L') +
-          'Z'
-        )
-      })
-      .join(' ')
-
-    return `<path fill="black" d="${pathData}" />`
+    return simplifiedPaths.map((path) =>
+      path.map((p) => [Math.floor(p / m), p % m]),
+    )
   })
+
+  const svgPathDefinitions = (compoundPath ? [outlines.flat()] : outlines).map(
+    (paths) =>
+      paths
+        .map((path) => {
+          return (
+            'M' +
+            path
+              .map((p) => {
+                const x = Math.floor(p[0])
+                const y = p[1]
+                return `${x},${y}`
+              })
+              .join('L') +
+            'Z'
+          )
+        })
+        .join(' '),
+  )
 
   return [
     `<svg viewBox="0 0 ${n} ${n}" xmlns="http://www.w3.org/2000/svg">`,
     '<g>',
-    ...outlines,
+    ...svgPathDefinitions.map((d) => `<path fill="black" d="${d}" />`),
     '</g>',
     `</svg>`,
   ].join('\n')

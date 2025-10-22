@@ -22,6 +22,7 @@ export const Route = createFileRoute('/_main/qr/')({
 function RouteComponent() {
   const [input, setInput] = useState('')
   const [version, setVersion] = useState<number | null>(null)
+  const [centerBlankSize, setCenterBlankSize] = useState(0)
   const [errorCorrectionLevel, setErrorCorrectionLevel] =
     useState<ErrorCorrectionLevel>('M')
 
@@ -40,7 +41,11 @@ function RouteComponent() {
         })
         const { size, data } = qr.modules
         if (isMounted) {
-          setData(convertToPaths(size, data))
+          setData(
+            convertToPaths(size, data, {
+              centerBlankSize,
+            }),
+          )
           setError(null)
         }
       } catch (error) {
@@ -57,7 +62,7 @@ function RouteComponent() {
       isMounted = false
       throttleTimeout && clearTimeout(throttleTimeout)
     }
-  }, [input, version, errorCorrectionLevel])
+  }, [input, version, errorCorrectionLevel, centerBlankSize])
 
   return (
     <Container>
@@ -119,6 +124,22 @@ function RouteComponent() {
                   )
                 }
                 placeholder="자동 선택"
+              />
+            </Stack>
+            <Stack direction="row" spacing={2} alignItems="center" mt={2}>
+              <Typography sx={{ flex: 1, minWidth: 0 }}>
+                중앙 공백 크기 (0-제한)
+              </Typography>
+              <TextField
+                sx={{ flex: 3, minWidth: 0 }}
+                fullWidth
+                type="number"
+                inputProps={{ min: 0 }}
+                value={centerBlankSize}
+                onChange={(e) =>
+                  setCenterBlankSize(Math.max(0, Number(e.target.value)))
+                }
+                placeholder="0"
               />
             </Stack>
             <Stack direction="row" spacing={2} alignItems="center" mt={2}>
