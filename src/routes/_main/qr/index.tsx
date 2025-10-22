@@ -10,7 +10,12 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material'
-import { IconCheck, IconCopy, IconSvg } from '@tabler/icons-react'
+import {
+  IconCheck,
+  IconCopy,
+  IconInfoCircle,
+  IconSvg,
+} from '@tabler/icons-react'
 import { createFileRoute } from '@tanstack/react-router'
 import QRCode from 'qrcode'
 import { useEffect, useState } from 'react'
@@ -194,7 +199,12 @@ function RouteComponent() {
             </Stack>
             <Stack direction="row" spacing={2} alignItems="center" mt={2}>
               <Typography sx={{ flex: 1, minWidth: 0 }}>
-                중앙 공백 크기 (0-제한)
+                중앙 공백 크기 (0-제한){' '}
+                <Tooltip title="중앙에 빈 공간을 만들어 로고 등을 삽입할 수 있습니다. 빈 공간이 너무 크면 QR 코드가 인식되지 않을 수 있습니다.">
+                  <IconButton size="small">
+                    <IconInfoCircle />
+                  </IconButton>
+                </Tooltip>
               </Typography>
               <TextField
                 sx={{ flex: 3, minWidth: 0 }}
@@ -210,7 +220,12 @@ function RouteComponent() {
             </Stack>
             <Stack direction="row" spacing={2} alignItems="center" mt={2}>
               <Typography sx={{ flex: 1, minWidth: 0 }}>
-                패딩 크기 (0-제한)
+                패딩 크기 (0-제한){' '}
+                <Tooltip title="주변에 여백을 추가합니다.">
+                  <IconButton size="small">
+                    <IconInfoCircle />
+                  </IconButton>
+                </Tooltip>
               </Typography>
               <TextField
                 sx={{ flex: 3, minWidth: 0 }}
@@ -226,7 +241,12 @@ function RouteComponent() {
             </Stack>
             <Stack direction="row" spacing={2} alignItems="center" mt={2}>
               <Typography sx={{ flex: 1, minWidth: 0 }}>
-                오류 수정 수준
+                오류 수정 수준{' '}
+                <Tooltip title="오류 수정 수준이 높으면 많은 부분이 가려져도 복원이 가능해지지만, QR 코드의 크기가 커집니다.">
+                  <IconButton size="small">
+                    <IconInfoCircle />
+                  </IconButton>
+                </Tooltip>
               </Typography>
               <Select
                 sx={{ flex: 3, minWidth: 0 }}
