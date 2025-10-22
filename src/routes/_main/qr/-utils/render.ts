@@ -280,6 +280,9 @@ export const convertToPaths = (
       : []),
     ...(showGrid ? ['</g>'] : []),
     '</g>',
+    `<rect x="${-paddingSize}" y="${-paddingSize}" width="${
+      n + paddingSize * 2
+    }" height="${n + paddingSize * 2}" stroke="none" fill="none" />`,
     `</svg>`,
   ].join('\n')
 }
