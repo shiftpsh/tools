@@ -40,10 +40,10 @@ interface Props {
   value: string
   onCopy: (char: string) => void
   active?: boolean
-  index?: number
+  label?: string
 }
 
-const Character = ({ value, onCopy, active, index }: Props) => {
+const Character = ({ value, onCopy, active, label }: Props) => {
   const ref = useRef<HTMLSpanElement>(null)
   const [copied, setCopied] = useState(false)
 
@@ -68,7 +68,7 @@ const Character = ({ value, onCopy, active, index }: Props) => {
       copied={copied}
     >
       {value}
-      {active && <CharacterLabel>{index}</CharacterLabel>}
+      {(label?.length || 0) > 0 && <CharacterLabel>{label}</CharacterLabel>}
     </CharacterContainer>
   )
 }

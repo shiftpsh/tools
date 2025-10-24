@@ -3,11 +3,10 @@ import { Alert, Box, Container, Paper, Stack, TextField } from '@mui/material'
 import { createFileRoute } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 import Character from './-components/Character'
-import {
-  HANJA_CATEGORY_HANGUL,
-  HANJA_CHARS,
-  VALID_HANJA_CATEGORIES,
-} from './-utils/hanja'
+import { HANJA_CATEGORY_HANGUL, HANJA_CHARS } from './-utils/state/hanja'
+import { nextState } from './-utils/state/state'
+import type { GlyphsState } from './-utils/state/types'
+import { CIRCLE_CHARS } from './-utils/state/circle'
 
 const HANJA_CHAR_ENTRIES = Object.entries(HANJA_CHARS)
 
@@ -35,18 +34,13 @@ const KeyLabelAlpha = styled('span')({
   top: 4,
 })
 
-interface State {
-  category: string
-  index: number
-}
-
 export const Route = createFileRoute('/_main/glyphs/')({
   component: RouteComponent,
 })
 
 function RouteComponent() {
   const [input, setInput] = useState('')
-  const [state, setState] = useState<State | null>(null)
+  const [state, setState] = useState<GlyphsState | null>(null)
 
   const onCopyChar = (char: string) => {
     navigator.clipboard.writeText(char)
@@ -56,59 +50,11 @@ function RouteComponent() {
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.ctrlKey || e.metaKey) return
-      const { key, shiftKey } = e
-      if (key === 'Escape') {
-        e.preventDefault()
-        setState(null)
-        return
-      }
-      const isNumber = /^[1-9]$/.test(key)
-      if (isNumber && state?.category) {
-        const { category, index } = state
-        const calculatedIndex = index * 9 + (parseInt(key, 10) - 1)
-        const charList = HANJA_CHARS[category].flat()
-        if (calculatedIndex >= 0 && calculatedIndex < charList.length) {
-          e.preventDefault()
-          onCopyChar(charList[calculatedIndex])
-          return
-        }
-      }
-      const isArrowKey =
-        key === 'ArrowUp' ||
-        key === 'ArrowDown' ||
-        key === 'ArrowLeft' ||
-        key === 'ArrowRight'
-      if (isArrowKey && state?.category) {
-        e.preventDefault()
-        const { category, index } = state
-        const charList = HANJA_CHARS[category].flat()
-        const itemsPerRow = 9
-        let newIndex = index
-        if (key === 'ArrowUp' || key === 'ArrowLeft') {
-          newIndex = Math.max(0, index - 1)
-        } else if (key === 'ArrowDown' || key === 'ArrowRight') {
-          newIndex = Math.min(
-            Math.floor((charList.length - 1) / itemsPerRow),
-            index + 1,
-          )
-        }
-        setState({
-          category,
-          index: newIndex,
-        })
-        return
-      }
-      const validKey =
-        !shiftKey && VALID_HANJA_CATEGORIES.includes(key.toLowerCase())
-      const validKeyShift =
-        shiftKey && VALID_HANJA_CATEGORIES.includes(key.toUpperCase())
-      if (validKey || validKeyShift) {
-        e.preventDefault()
-        setState({
-          category: shiftKey ? key.toUpperCase() : key.toLowerCase(),
-          index: 0,
-        })
+      const { newState, input } = nextState(state, e)
+      setState(newState)
+      if (input) {
+        navigator.clipboard.writeText(input)
+        setInput((prev) => prev + input)
       }
     }
     window.addEventListener('keydown', onKeyDown)
@@ -123,6 +69,7 @@ function RouteComponent() {
           <Stack spacing={1}>
             <Box>한자 버튼이 없는 불쌍한 맥 유저를 구해주세요.</Box>
             <Box>
+              <strong>한자 특수 기호</strong>
               <ul>
                 <li>
                   키보드에서 자음을 누른 후, 화살표 키와 숫자 키로 조작해
@@ -132,18 +79,64 @@ function RouteComponent() {
                 <li>글자를 클릭해도 복사됩니다.</li>
               </ul>
             </Box>
+            <Box>
+              <strong>기타</strong>
+              <ul>
+                <li>
+                  <b>o</b> 키를 누르면 원 문자 입력 모드로 전환합니다.
+                </li>
+              </ul>
+            </Box>
           </Stack>
         </Alert>
-        <Paper sx={{ p: 2, position: 'sticky', top: 70, zIndex: 1 }}>
-          <TextField
-            label="입력"
-            fullWidth
-            multiline
-            minRows={4}
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-          />
-        </Paper>
+        <Stack
+          spacing={2}
+          sx={{
+            position: 'sticky',
+            top: 70,
+            zIndex: 1,
+          }}
+        >
+          <Paper sx={{ p: 2 }}>
+            <TextField
+              label="입력"
+              fullWidth
+              multiline
+              minRows={4}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+            />
+          </Paper>
+          {state?.type === 'circle' && (
+            <Alert sx={{ p: 2 }} severity="info">
+              <Stack spacing={2}>
+                <Box sx={{ fontSize: '150%' }}>
+                  {CIRCLE_CHARS.find(([k]) => k === state.input)?.[1] ?? ''}
+                </Box>
+                <Stack direction="row" flexWrap="wrap" sx={{ gap: 1 }}>
+                  {CIRCLE_CHARS.filter(
+                    ([k]) => k.startsWith(state.input) && k !== state.input,
+                  ).length > 0 &&
+                    CIRCLE_CHARS.filter(
+                      ([k]) => k.startsWith(state.input) && k !== state.input,
+                    ).map(([k, v]) => (
+                      <Character
+                        key={k}
+                        value={v}
+                        onCopy={onCopyChar}
+                        active={false}
+                        label={k.slice(state.input.length)}
+                      />
+                    ))}
+                </Stack>
+                <Box>
+                  Enter, Space, Tab 키를 눌러 입력을 마칩니다. Backspace 키로
+                  입력을 지울 수 있습니다.
+                </Box>
+              </Stack>
+            </Alert>
+          )}
+        </Stack>
         <Paper sx={{ p: 2 }}>
           <Stack spacing={4}>
             {HANJA_CHAR_ENTRIES.map(([category, chars]) => (
@@ -173,9 +166,17 @@ function RouteComponent() {
                             value={char}
                             onCopy={onCopyChar}
                             active={
-                              state?.category === category && state?.index === i
+                              state?.type === 'hanja' &&
+                              state.category === category &&
+                              state.page === i
                             }
-                            index={j + 1}
+                            label={
+                              state?.type === 'hanja' &&
+                              state.category === category &&
+                              state.page === i
+                                ? (j + 1).toString()
+                                : undefined
+                            }
                           />
                         ))}
                       </Stack>

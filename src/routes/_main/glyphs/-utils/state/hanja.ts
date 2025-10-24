@@ -1,4 +1,6 @@
-import { splitArrayIntoChunks } from './array'
+import { splitArrayIntoChunks } from '../array'
+import type { StateTransitionFn } from './types'
+import { isValidHanjaCategoryKey } from './utils'
 
 const HANJA_CHARS_DATA = {
   r: '　,！,＇,，,．,／,：,；,？,＾,＿,｀,｜,￣,、,。,·,‥,…,¨,〃,­,―,∥,＼,∼,´,～,ˇ,˘,˝,˚,˙,¸,˛,¡,¿,ː',
@@ -50,4 +52,76 @@ export const HANJA_CATEGORY_HANGUL: Record<string, string> = {
   Q: 'ㅃ',
   T: 'ㅆ',
   W: 'ㅉ',
+}
+
+export const nextStateHanja: StateTransitionFn = (state, action) => {
+  const { key, shiftKey } = action
+
+  if (!state || state.type !== 'hanja') {
+    throw new Error('Invalid state type for nextStateHanja')
+  }
+
+  if (key.toLowerCase() === 'o') {
+    action.preventDefault()
+    return {
+      newState: {
+        type: 'circle',
+        input: '',
+      },
+      input: null,
+    }
+  }
+  if (isValidHanjaCategoryKey(action)) {
+    action.preventDefault()
+    return {
+      newState: {
+        type: 'hanja',
+        category: shiftKey ? key.toUpperCase() : key.toLowerCase(),
+        page: 0,
+      },
+      input: null,
+    }
+  }
+  const maxPage = HANJA_CHARS[state.category].length - 1
+  if (key === 'ArrowUp' || key === 'ArrowLeft') {
+    action.preventDefault()
+    return {
+      newState: {
+        ...state,
+        page: state.page === 0 ? maxPage : state.page - 1,
+      },
+      input: null,
+    }
+  }
+  if (key === 'ArrowDown' || key === 'ArrowRight') {
+    action.preventDefault()
+    return {
+      newState: {
+        ...state,
+        page: state.page === maxPage ? 0 : state.page + 1,
+      },
+      input: null,
+    }
+  }
+  const isNumber = /^[1-9]$/.test(key)
+  if (isNumber) {
+    const row = HANJA_CHARS[state.category][state.page]
+    const index = parseInt(key, 10) - 1
+    if (index >= 0 && index < row.length) {
+      action.preventDefault()
+      return {
+        newState: null,
+        input: row[index],
+      }
+    } else {
+      return {
+        newState: state,
+        input: null,
+      }
+    }
+  }
+  return {
+    newState: state,
+    input: null,
+  }
 }
