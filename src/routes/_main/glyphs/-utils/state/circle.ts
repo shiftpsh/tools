@@ -1,7 +1,7 @@
 import type { StateTransitionFn } from './types'
 
 export const CIRCLE_CHARS = [
-  '=◯,!=©,@=®,^=°',
+  '=◯,!=©,@=®,^=°,/=∅',
   'a=ⓐ,b=ⓑ,c=ⓒ,d=ⓓ,e=ⓔ,f=ⓕ,g=ⓖ,h=ⓗ,i=ⓘ,j=ⓙ,k=ⓚ,l=ⓛ,m=ⓜ,n=ⓝ,o=ⓞ,p=ⓟ,q=ⓠ,r=ⓡ,s=ⓢ,t=ⓣ,u=ⓤ,v=ⓥ,w=ⓦ,x=ⓧ,y=ⓨ,z=ⓩ',
   'A=Ⓐ,B=Ⓑ,C=Ⓒ,D=Ⓓ,E=Ⓔ,F=Ⓕ,G=Ⓖ,H=Ⓗ,I=Ⓘ,J=Ⓙ,K=Ⓚ,L=Ⓛ,M=Ⓜ,N=Ⓝ,O=Ⓞ,P=Ⓟ,Q=Ⓠ,R=Ⓡ,S=Ⓢ,T=Ⓣ,U=Ⓤ,V=Ⓥ,W=Ⓦ,X=Ⓧ,Y=Ⓨ,Z=Ⓩ',
   '0=⓪',
@@ -10,7 +10,7 @@ export const CIRCLE_CHARS = [
   '21=㉑,22=㉒,23=㉓,24=㉔,25=㉕,26=㉖,27=㉗,28=㉘,29=㉙,30=㉚',
   '31=㉛,32=㉜,33=㉝,34=㉞,35=㉟,36=㊱,37=㊲,38=㊳,39=㊴,40=㊵',
   '41=㊶,42=㊷,43=㊸,44=㊹,45=㊺,46=㊻,47=㊼,48=㊽,49=㊾,50=㊿',
-  '-0=⓿',
+  '-=●,-0=⓿',
   '-1=❶,-2=❷,-3=❸,-4=❹,-5=❺,-6=❻,-7=❼,-8=❽,-9=❾,-10=❿',
   '-11=⓫,-12=⓬,-13=⓭,-14=⓮,-15=⓯,-16=⓰,-17=⓱,-18=⓲,-19=⓳,-20=⓴',
   '+=◎',
@@ -31,6 +31,23 @@ export const nextStateCircle: StateTransitionFn = (state, action) => {
   if (!state || state.type !== 'circle') {
     throw new Error('Invalid state type for nextStateCircle')
   }
+
+  const commit = () => {
+    action.preventDefault()
+    const matchedEntry = CIRCLE_CHARS.find(([k]) => k === state.input)
+    if (matchedEntry) {
+      return {
+        newState: null,
+        input: matchedEntry[1],
+      }
+    } else {
+      return {
+        newState: null,
+        input: null,
+      }
+    }
+  }
+
   if (key === 'Backspace') {
     action.preventDefault()
     if (state.input.length === 0) {
@@ -47,21 +64,7 @@ export const nextStateCircle: StateTransitionFn = (state, action) => {
       input: null,
     }
   }
-  if (COMMIT_KEYS.includes(key)) {
-    action.preventDefault()
-    const matchedEntry = CIRCLE_CHARS.find(([k]) => k === state.input)
-    if (matchedEntry) {
-      return {
-        newState: null,
-        input: matchedEntry[1],
-      }
-    } else {
-      return {
-        newState: null,
-        input: null,
-      }
-    }
-  }
+  if (COMMIT_KEYS.includes(key)) return commit()
 
   const { input } = state
   if (key.length === 1) {
@@ -75,6 +78,9 @@ export const nextStateCircle: StateTransitionFn = (state, action) => {
       }
     }
     if (matchedEntry.length === 0) {
+      if (key.toLowerCase() === 'o') {
+        return { ...commit(), newState: { type: 'circle', input: '' } }
+      }
       return {
         newState: state,
         input: null,
