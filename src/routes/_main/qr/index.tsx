@@ -1,5 +1,6 @@
 import {
   Alert,
+  Box,
   Container,
   IconButton,
   MenuItem,
@@ -284,6 +285,7 @@ function RouteComponent() {
           다른 QR 생성기와 달리 광고를 삽입하지 않고, 정사각형 QR 코드를
           생성하며, 래스터 시 사각형들 사이에 간격이 생기지 않도록 합니다.
         </Alert>
+        <Box sx={{ height: 32 }} />
       </Stack>
     </Container>
   )

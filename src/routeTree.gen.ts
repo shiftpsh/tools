@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as MainRouteRouteImport } from './routes/_main/route'
 import { Route as MainIndexRouteImport } from './routes/_main/index'
 import { Route as MainQrIndexRouteImport } from './routes/_main/qr/index'
+import { Route as MainGlyphsIndexRouteImport } from './routes/_main/glyphs/index'
 
 const MainRouteRoute = MainRouteRouteImport.update({
   id: '/_main',
@@ -27,27 +28,35 @@ const MainQrIndexRoute = MainQrIndexRouteImport.update({
   path: '/qr/',
   getParentRoute: () => MainRouteRoute,
 } as any)
+const MainGlyphsIndexRoute = MainGlyphsIndexRouteImport.update({
+  id: '/glyphs/',
+  path: '/glyphs/',
+  getParentRoute: () => MainRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof MainIndexRoute
+  '/glyphs': typeof MainGlyphsIndexRoute
   '/qr': typeof MainQrIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof MainIndexRoute
+  '/glyphs': typeof MainGlyphsIndexRoute
   '/qr': typeof MainQrIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_main': typeof MainRouteRouteWithChildren
   '/_main/': typeof MainIndexRoute
+  '/_main/glyphs/': typeof MainGlyphsIndexRoute
   '/_main/qr/': typeof MainQrIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/qr'
+  fullPaths: '/' | '/glyphs' | '/qr'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/qr'
-  id: '__root__' | '/_main' | '/_main/' | '/_main/qr/'
+  to: '/' | '/glyphs' | '/qr'
+  id: '__root__' | '/_main' | '/_main/' | '/_main/glyphs/' | '/_main/qr/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -77,16 +86,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainQrIndexRouteImport
       parentRoute: typeof MainRouteRoute
     }
+    '/_main/glyphs/': {
+      id: '/_main/glyphs/'
+      path: '/glyphs'
+      fullPath: '/glyphs'
+      preLoaderRoute: typeof MainGlyphsIndexRouteImport
+      parentRoute: typeof MainRouteRoute
+    }
   }
 }
 
 interface MainRouteRouteChildren {
   MainIndexRoute: typeof MainIndexRoute
+  MainGlyphsIndexRoute: typeof MainGlyphsIndexRoute
   MainQrIndexRoute: typeof MainQrIndexRoute
 }
 
 const MainRouteRouteChildren: MainRouteRouteChildren = {
   MainIndexRoute: MainIndexRoute,
+  MainGlyphsIndexRoute: MainGlyphsIndexRoute,
   MainQrIndexRoute: MainQrIndexRoute,
 }
 

@@ -1,5 +1,6 @@
 import {
   AppBar,
+  Box,
   Drawer,
   IconButton,
   List,
@@ -12,6 +13,7 @@ import {
 } from '@mui/material'
 import {
   IconChevronLeft,
+  IconClubs,
   IconHome,
   IconMenu,
   IconQrcode,
@@ -30,6 +32,11 @@ const TOOLS = [
     url: '/qr',
     label: 'QR Code',
   },
+  {
+    icon: <IconClubs />,
+    url: '/glyphs',
+    label: '특수 문자',
+  },
 ]
 
 const RouterListItem = createLink(ListItem)
@@ -47,7 +54,7 @@ export default function Header() {
 
   return (
     <>
-      <AppBar position="static">
+      <AppBar position="fixed">
         <Toolbar>
           <IconButton
             size="large"
@@ -62,6 +69,7 @@ export default function Header() {
           Tools by shiftpsh
         </Toolbar>
       </AppBar>
+      <Box sx={{ height: 64 }} />
       <Drawer anchor="left" open={isOpen} onClose={() => setIsOpen(false)}>
         <DrawerHeader>
           <IconButton onClick={() => setIsOpen(false)}>
