@@ -126,7 +126,8 @@ function RouteComponent() {
               <ul>
                 <li>
                   키보드에서 자음을 누른 후, 화살표 키와 숫자 키로 조작해
-                  특수문자를 복사할 수 있습니다.
+                  특수문자를 복사할 수 있습니다. (쌍자음은 Shift와 함께 눌러
+                  주세요)
                 </li>
                 <li>글자를 클릭해도 복사됩니다.</li>
               </ul>
@@ -166,7 +167,7 @@ function RouteComponent() {
                   >
                     {chars.map((charChunk, i) => (
                       <Stack key={i} direction="row" spacing={1} sx={{ mb: 1 }}>
-                        {charChunk.map((char) => (
+                        {charChunk.map((char, j) => (
                           <Character
                             key={char}
                             value={char}
@@ -174,6 +175,7 @@ function RouteComponent() {
                             active={
                               state?.category === category && state?.index === i
                             }
+                            index={j + 1}
                           />
                         ))}
                       </Stack>

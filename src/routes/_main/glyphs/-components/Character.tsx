@@ -6,6 +6,7 @@ const CharacterContainer = styled('span')<{
   copied?: boolean
 }>(({ active, copied }) => ({
   display: 'block',
+  position: 'relative',
   width: 32,
   height: 32,
   lineHeight: '32px',
@@ -20,13 +21,29 @@ const CharacterContainer = styled('span')<{
   },
 }))
 
+const CharacterLabel = styled('span')({
+  position: 'absolute',
+  top: -12,
+  left: '50%',
+  transform: 'translateX(-50%)',
+  fontSize: '75%',
+  fontWeight: 'bold',
+  height: 16,
+  lineHeight: '16px',
+  padding: '0 4px',
+  borderRadius: 4,
+  border: '1px solid #eee',
+  backgroundColor: 'rgba(255, 255, 255, 0.6)',
+})
+
 interface Props {
   value: string
   onCopy: (char: string) => void
   active?: boolean
+  index?: number
 }
 
-const Character = ({ value, onCopy, active }: Props) => {
+const Character = ({ value, onCopy, active, index }: Props) => {
   const ref = useRef<HTMLSpanElement>(null)
   const [copied, setCopied] = useState(false)
 
@@ -51,6 +68,7 @@ const Character = ({ value, onCopy, active }: Props) => {
       copied={copied}
     >
       {value}
+      {active && <CharacterLabel>{index}</CharacterLabel>}
     </CharacterContainer>
   )
 }
