@@ -1,3 +1,4 @@
+import { Container, Paper, Stack } from '@mui/material'
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/_main/')({
@@ -6,28 +7,16 @@ export const Route = createFileRoute('/_main/')({
 
 function App() {
   return (
-    <div className="text-center">
-      <header className="min-h-screen flex flex-col items-center justify-center bg-[#282c34] text-white text-[calc(10px+2vmin)]">
-        <p>
-          Edit <code>src/routes/index.tsx</code> and save to reload.
-        </p>
-        <a
-          className="text-[#61dafb] hover:underline"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-        <a
-          className="text-[#61dafb] hover:underline"
-          href="https://tanstack.com"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn TanStack
-        </a>
-      </header>
-    </div>
+    <Container>
+      <Stack spacing={2} sx={{ mb: 2, mt: 2 }}>
+        <Paper sx={{ p: 2 }}>
+          개인적 필요에 의해 만든 도구 모음입니다. 사이트가 깔끔하지 않을 수
+          있습니다. (ㅠㅠ)
+        </Paper>
+        <Paper sx={{ p: 2 }}>
+          만든 사람: <a href="https://shiftpsh.com">shiftpsh</a>
+        </Paper>
+      </Stack>
+    </Container>
   )
 }
